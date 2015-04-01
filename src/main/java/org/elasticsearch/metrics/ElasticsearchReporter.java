@@ -191,19 +191,19 @@ public class ElasticsearchReporter extends ScheduledReporter {
          * @return
          */
         public Builder additionalFields(Map<String, Object> additionalFields) {
-            loadAdditionnalFieldsFromSystemProperties(additionalFields);
+            loadAdditionalFieldsFromSystemProperties(additionalFields);
             this.additionalFields = additionalFields;
             return this;
         }
 
         public Builder initializeAdditionalFieldsFromSystemProperties() {
             Map <String, Object> additionalFields = new HashMap<>();
-            loadAdditionnalFieldsFromSystemProperties(additionalFields);
+            loadAdditionalFieldsFromSystemProperties(additionalFields);
             this.additionalFields = additionalFields;
             return this;
         }
 
-        private void loadAdditionnalFieldsFromSystemProperties(final Map<String, Object> additionalFields) {
+        private void loadAdditionalFieldsFromSystemProperties(final Map<String, Object> additionalFields) {
             Properties properties = System.getProperties();
             for (final Object propertyKeyObj : properties.keySet()) {
                 String propertyKey = (String) propertyKeyObj;
