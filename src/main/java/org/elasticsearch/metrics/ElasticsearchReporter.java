@@ -50,6 +50,7 @@ public class ElasticsearchReporter extends ScheduledReporter {
     }
 
     public static class Builder {
+        private static final String PREFIX_ADDITIONAL_FIELDS_FROM_SYSTEM_PROPERTIES = "metrics.additionalFields.";
         private final MetricRegistry registry;
         private Clock clock;
         private String prefix;
@@ -190,11 +191,33 @@ public class ElasticsearchReporter extends ScheduledReporter {
          * @return
          */
         public Builder additionalFields(Map<String, Object> additionalFields) {
+            loadAdditionnalFieldsFromSystemProperties(additionalFields);
             this.additionalFields = additionalFields;
             return this;
         }
 
+        public Builder initializeAdditionalFieldsFromSystemProperties() {
+            Map <String, Object> additionalFields = new HashMap<>();
+            loadAdditionnalFieldsFromSystemProperties(additionalFields);
+            this.additionalFields = additionalFields;
+            return this;
+        }
+
+        private void loadAdditionnalFieldsFromSystemProperties(final Map<String, Object> additionalFields) {
+            Properties properties = System.getProperties();
+            for (final Object propertyKeyObj : properties.keySet()) {
+                String propertyKey = (String) propertyKeyObj;
+                if(propertyKey.startsWith(PREFIX_ADDITIONAL_FIELDS_FROM_SYSTEM_PROPERTIES)) {
+                    String[] field_name = propertyKey.split(PREFIX_ADDITIONAL_FIELDS_FROM_SYSTEM_PROPERTIES);
+                    additionalFields.put(field_name[1], properties.getProperty(propertyKey));
+                }
+            }
+        }
+
         public ElasticsearchReporter build() throws IOException {
+            if(additionalFields == null) {
+                initializeAdditionalFieldsFromSystemProperties();
+            }
             return new ElasticsearchReporter(registry,
                     hosts,
                     timeout,

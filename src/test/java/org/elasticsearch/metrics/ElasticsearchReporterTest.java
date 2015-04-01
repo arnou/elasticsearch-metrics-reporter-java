@@ -36,6 +36,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.metrics.percolation.Notifier;
 import org.elasticsearch.test.ElasticsearchIntegrationTest;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,7 +61,13 @@ public class ElasticsearchReporterTest extends ElasticsearchIntegrationTest {
 
     @Before
     public void setup() throws IOException {
+        System.setProperty("metrics.additionalFields.test", "testOfAdditionalFieldsFromSystemProperties");
         elasticsearchReporter = createElasticsearchReporterBuilder().build();
+    }
+
+    @After
+    public void deallocateSystemProperty() throws IOException {
+        System.clearProperty("metrics.additionalFields.test");
     }
 
     @Test
@@ -141,6 +148,7 @@ public class ElasticsearchReporterTest extends ElasticsearchIntegrationTest {
         assertKey(hit, "count", 25);
         assertKey(hit, "name", prefix + ".test.cache-evictions");
         assertKey(hit, "host", "localhost");
+        assertKey(hit, "test", "testOfAdditionalFieldsFromSystemProperties");
     }
 
     @Test
